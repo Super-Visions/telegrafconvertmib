@@ -1,0 +1,49 @@
+{{ $module := .Module -}}
+{{- if .Enums -}}
+
+
+[[processors.enum]]
+  order = 10
+  namepass = ["snmp_trap"]
+  tagpass = { mib = ["{{.Module}}"] }
+
+{{- range $field, $value_mappings := .Enums }}
+
+  # Translate {{$module}}::{{$field}}
+  [[processors.enum.mapping]]
+    ## Name of the field to map
+    field = "{{$field}}"
+
+    ## Table of mappings
+    [processors.enum.mapping.value_mappings]
+{{- range $value, $name := $value_mappings }}
+      {{$value}} = "{{$name}}"
+{{- end }}
+{{- end }}
+{{ end -}}
+
+{{- if .Fields }}
+
+[[processors.converter]]
+  order = 20
+  namepass = ["snmp_trap"]
+  tagpass = { mib = ["{{.Module}}"] }
+
+  [processors.converter.fields]
+    tag = ["{{ join .Fields "\", \"" }}"]
+{{ end -}}
+
+{{- range .Traps }}
+
+# Prepare message for {{$module}}::{{.Name}}
+[[processors.template]]
+  order = 30
+  namepass = ["snmp_trap"]
+  tagpass = { trap = ["{{$module}}::{{.Name}}"] }
+
+  tag = "message"
+  template = '''{{.Description}}
+{{- range .Fields }}
+{{.}}:{{ "{{" }} .Tag "{{.}}" {{ "}}" }} 
+{{- end }}'''
+{{ end }}
