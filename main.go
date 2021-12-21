@@ -133,7 +133,6 @@ func FindModuleTraps(module string) ([]gosmi.SmiNode, error) {
 
 func ParseTrapToConfig(trap gosmi.SmiNode) (config trapConfigTrap) {
 	config.Name = trap.Name
-	// config.Description = strings.NewReplacer("\r\n", " ", "\n", " ", "  ", " ").Replace(trap.Description)
 	config.Description = trap.Description
 
 	trapFields := trap.GetNotificationObjects()
