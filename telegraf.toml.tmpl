@@ -7,16 +7,16 @@
   namepass = ["snmp_trap"]
   tagpass = { mib = ["{{.Module}}"] }
 
-{{- range $field, $value_mappings := .Enums }}
+{{- range .Enums }}
 
-  # Translate {{$module}}::{{$field}}
+  # Translate {{.Module}}::{{.Name}}
   [[processors.enum.mapping]]
     ## Name of the field to map
-    field = "{{$field}}"
+    field = "{{.Name}}"
 
     ## Table of mappings
     [processors.enum.mapping.value_mappings]
-{{- range $value, $name := $value_mappings }}
+{{- range $value, $name := .Values }}
       {{$value}} = "{{$name}}"
 {{- end }}
 {{- end }}

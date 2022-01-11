@@ -26,7 +26,7 @@ func (a *stringArray) Set(value string) error {
 type trapConfig struct {
 	Module string
 	Fields stringArray
-	Enums  map[string]map[int64]string
+	Enums  []trapField
 	Traps  []trapConfigTrap
 }
 
@@ -36,11 +36,15 @@ type trapConfigTrap struct {
 	Description string
 }
 
+type trapField struct {
+	Module string
+	Name   string
+	Values map[int64]string
+}
+
 func main() {
 	var err error
-	config := trapConfig{
-		Enums: make(map[string]map[int64]string),
-	}
+	var config trapConfig
 
 	// Parse commandline flags
 	paths := stringArray{"/usr/share/snmp/mibs"}
@@ -77,11 +81,11 @@ func main() {
 	// Get list of fields to convert/translate
 	fields := GetAllTrapFields(trapNodes)
 	config.Fields = make([]string, 0, len(fields))
-	for fieldName, values := range fields {
+	for fieldName, trapField := range fields {
 		config.Fields = append(config.Fields, fieldName)
 
-		if len(values) > 0 {
-			config.Enums[fieldName] = values
+		if len(trapField.Values) > 0 {
+			config.Enums = append(config.Enums, trapField)
 		}
 	}
 
@@ -144,15 +148,19 @@ func ParseTrapToConfig(trap gosmi.SmiNode) (config trapConfigTrap) {
 	return config
 }
 
-func GetAllTrapFields(nodes []gosmi.SmiNode) map[string]map[int64]string {
-	trapFields := make(map[string]map[int64]string)
-	for _, node := range nodes {
-		for _, field := range node.GetNotificationObjects() {
-			trapFields[field.Name] = make(map[int64]string)
+func GetAllTrapFields(nodes []gosmi.SmiNode) map[string]trapField {
+	trapFields := make(map[string]trapField)
+	for _, trapNode := range nodes {
+		for _, objectNode := range trapNode.GetNotificationObjects() {
+			trapFields[objectNode.Name] = trapField{
+				Name:   objectNode.Name,
+				Module: objectNode.GetModule().Name,
+				Values: make(map[int64]string),
+			}
 
-			if field.Type.BaseType == types.BaseTypeEnum {
-				for _, value := range field.Type.Enum.Values {
-					trapFields[field.Name][value.Value] = value.Name
+			if objectNode.Type.BaseType == types.BaseTypeEnum {
+				for _, value := range objectNode.Type.Enum.Values {
+					trapFields[objectNode.Name].Values[value.Value] = value.Name
 				}
 			}
 		}
