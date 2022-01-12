@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/sleepinggenius2/gosmi"
 	"github.com/sleepinggenius2/gosmi/types"
@@ -90,7 +91,11 @@ func main() {
 	}
 
 	// Generate telegraf config file
-	t, err := template.New("telegraf.toml.tmpl").Funcs(template.FuncMap{"join": strings.Join}).ParseFiles("telegraf.toml.tmpl")
+	configFunctions := template.FuncMap{
+		"join": strings.Join,
+		"now":  time.Now,
+	}
+	t, err := template.New("telegraf.toml.tmpl").Funcs(configFunctions).ParseFiles("telegraf.toml.tmpl")
 	if err != nil {
 		log.Printf("Template parsing failed: %v", err)
 		os.Exit(2)
