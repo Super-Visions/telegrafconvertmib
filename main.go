@@ -33,6 +33,7 @@ type trapConfig struct {
 
 type trapConfigTrap struct {
 	Name        string
+	Oid         types.Oid
 	Fields      stringArray
 	Description string
 }
@@ -40,6 +41,7 @@ type trapConfigTrap struct {
 type trapField struct {
 	Module string
 	Name   string
+	Oid    types.Oid
 	Values map[int64]string
 }
 
@@ -143,6 +145,7 @@ func FindModuleTraps(module string) ([]gosmi.SmiNode, error) {
 func ParseTrapToConfig(trap gosmi.SmiNode) (config trapConfigTrap) {
 	config.Name = trap.Name
 	config.Description = trap.Description
+	config.Oid = trap.Oid
 
 	trapFields := trap.GetNotificationObjects()
 	config.Fields = make(stringArray, len(trapFields))
@@ -160,6 +163,7 @@ func GetAllTrapFields(nodes []gosmi.SmiNode) map[string]trapField {
 			trapFields[objectNode.Name] = trapField{
 				Name:   objectNode.Name,
 				Module: objectNode.GetModule().Name,
+				Oid:    objectNode.Oid,
 				Values: make(map[int64]string),
 			}
 
