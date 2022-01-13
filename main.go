@@ -60,7 +60,7 @@ func main() {
 	InitSMI(paths)
 	config.Module, err = gosmi.LoadModule(*module)
 	if err != nil {
-		log.Printf("Loading failed: %v", err)
+		log.Printf("Loading %s failed: %v", *module, err)
 		os.Exit(2)
 	}
 
