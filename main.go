@@ -167,7 +167,7 @@ func GetAllTrapFields(nodes []gosmi.SmiNode) map[string]trapField {
 				Values: make(map[int64]string),
 			}
 
-			if objectNode.Type.BaseType == types.BaseTypeEnum {
+			if objectNode.Type != nil && objectNode.Type.BaseType == types.BaseTypeEnum {
 				for _, value := range objectNode.Type.Enum.Values {
 					trapFields[objectNode.Name].Values[value.Value] = value.Name
 				}
