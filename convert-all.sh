@@ -8,7 +8,7 @@ shift
 Files=()
 for File
 do
-	if grep -q NOTIFICATION-TYPE "$File"; then
+	if grep -q "NOTIFICATION-TYPE\|TRAP-TYPE" "$File"; then
 		Files+=($(realpath $File))
 	fi
 done
