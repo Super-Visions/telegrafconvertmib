@@ -132,14 +132,7 @@ func FindModuleTraps(module string) ([]gosmi.SmiNode, error) {
 		return nil, fmt.Errorf("cannot get module %s: %w", module, err)
 	}
 
-	var trapNodes []gosmi.SmiNode
-	for _, node := range m.GetNodes() {
-		if node.Kind == types.NodeNotification {
-			trapNodes = append(trapNodes, node)
-		}
-	}
-
-	return trapNodes, nil
+	return m.GetNodes(types.NodeNotification), nil
 }
 
 func ParseTrapToConfig(trap gosmi.SmiNode) (config trapConfigTrap) {
