@@ -104,7 +104,7 @@ func main() {
 	}
 	var wr *os.File
 	if *directory != "" {
-		wr, err = os.Create(*directory + string(os.PathSeparator) + config.Module + ".conf")
+		wr, err = os.Create(*directory + string(os.PathSeparator) + config.Module + ".toml")
 		if err != nil {
 			log.Printf("Creating config file failed: %v", err)
 			os.Exit(2)
